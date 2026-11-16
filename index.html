@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#0f172a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>سيستم تحصيل ماكينات شحن</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:system-ui,-apple-system,'Segoe UI',Tahoma,Arial;background:#0f172a;color:#fff;padding-bottom:110px;min-height:100vh}
+.top{position:sticky;top:0;z-index:20;background:rgba(15,23,42,.95);backdrop-filter:blur(12px);padding:14px;border-bottom:1px solid #1e293b}
+.topRow{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.top h1{font-size:19px;margin:0}.top p{margin:4px 0 0;color:#94a3b8;font-size:12px}
+.logo{width:48px;height:48px;flex-shrink:0;border-radius:14px;background:linear-gradient(135deg,#22c55e,#0ea5e9);display:grid;place-items:center;font-size:24px}
+.status{display:inline-block;padding:6px 14px;border-radius:999px;font-size:12px;font-weight:800;background:#22c55e;color:#06130A;margin-top:10px}
+.status.offline{background:#f59e0b;color:#111}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px}
+.card{background:#1e293b;border-radius:16px;padding:14px;border:1px solid rgba(255,255,255,.06)}
+.card b{font-size:20px;display:block}.card span{color:#94a3b8;font-size:12px}
+.card.green b{color:#22c55e}.card.blue b{color:#38bdf8}.card.orange b{color:#f59e0b}.card.red b{color:#fb7185}
+.search{margin:0 12px 10px}.search input{width:100%;padding:13px;border-radius:14px;border:1px solid #334155;background:#020617;color:#fff;font-size:15px}
+.areas{display:flex;flex-wrap:wrap;gap:8px;padding:0 12px 12px}
+.areas button{padding:10px 12px;border-radius:999px;border:1px solid #334155;background:#1e293b;color:#fff;font-size:13px;cursor:pointer}
+.areas button.active{background:#22c55e;color:#111;font-weight:800}
+.list{padding:0 12px 12px;display:flex;flex-direction:column;gap:12px}
+.item{background:#1a1f2e;color:#fff;border-radius:20px;padding:14px;border:1px solid rgba(255,255,255,.06);box-shadow:0 10px 28px rgba(0,0,0,.3)}
+.itemTop{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.item h3{margin:0;font-size:18px}.item small{color:#94a3b8;font-size:12px}
+.badge{display:inline-block;background:rgba(34,197,94,.15);color:#4ade80;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:800;margin-top:6px}
+.bigAmount{flex-shrink:0;min-width:122px;text-align:center;background:linear-gradient(135deg,#111827,#0f766e);border-radius:16px;padding:11px 8px;border:1px solid #22c55e}
+.bigAmount small{display:block;font-size:11px;color:#a7f3d0;font-weight:800}.bigAmount b{display:block;font-size:28px;line-height:1.15}.bigAmount span{font-size:11px;color:#d1fae5}
+.pills{display:flex;gap:6px;margin-top:11px;flex-wrap:wrap;justify-content:flex-end}.pills span{background:#242b3d;padding:7px 10px;border-radius:999px;font-size:12px;font-weight:700}.pills span.red{background:#3a222c;color:#fda4af}.pills span.green{color:#4ade80}
+.row{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap}.row button{flex:1;padding:12px;border-radius:13px;border:0;font-weight:900;cursor:pointer;font-size:13px;min-width:100px}
+.b1{background:#22c55e;color:#06130A}.b2{background:#0ea5e9;color:#fff}.b3{background:#f59e0b}.b4{background:#2a3145;color:#cbd5e1}.bEdit{background:#f59e0b;color:#111}
+.form{background:#1e293b;margin:0 12px 12px;border-radius:18px;padding:14px;border:2px solid #22c55e}
+.form label{display:block;font-size:13px;color:#cbd5e1;margin:12px 0 6px;font-weight:700}
+.form input,.form select{width:100%;padding:14px;border-radius:12px;border:1px solid #334155;background:#020617;color:#fff;font-size:18px}
+.big{font-size:24px!important;font-weight:900}
+.save{width:100%;padding:15px;border:0;border-radius:14px;background:#22c55e;font-weight:900;font-size:16px;margin-top:14px;cursor:pointer}
+.ghost{width:100%;padding:12px;border-radius:12px;border:1px solid #334155;background:#1e293b;color:#fff;margin-top:8px;cursor:pointer}
+.hist{margin:12px;background:#1e293b;color:#fff;border-radius:16px;padding:12px;border:1px solid rgba(255,255,255,.06)}
+.opRow{border-bottom:1px solid #334155;padding:10px 0}.opRow:last-child{border:0}
+.opBtns{display:flex;gap:6px;margin-top:6px}.opBtns button{padding:7px 12px;border-radius:999px;border:0;font-weight:800;font-size:12px;cursor:pointer}
+.tabs{position:fixed;bottom:0;left:0;right:0;background:#020617;border-top:1px solid #1e293b;display:flex;padding:8px 4px calc(8px + env(safe-area-inset-bottom));z-index:30}
+.tabs button{flex:1;background:none;border:0;color:#94a3b8;font-size:11px;cursor:pointer;padding:6px 2px;border-radius:12px}.tabs button.active{color:#22c55e;background:rgba(34,197,94,.12);font-weight:900}
+.tabs span{display:block;font-size:21px}
+.hidden{display:none!important}
+.note{background:#fef3c7;color:#92400e;border-radius:12px;padding:10px;margin:12px;font-size:13px}
+.repArea{background:#1e293b;border-radius:16px;padding:12px;margin:0 12px 12px;border:1px solid rgba(255,255,255,.06)}
+.repArea h3{margin:0 0 8px;font-size:16px;color:#4ade80}
+.repTable{width:100%;border-collapse:collapse;font-size:13px}
+.repTable th{background:#020617;padding:8px 6px;text-align:right;color:#94a3b8}
+.repTable td{padding:8px 6px;border-bottom:1px solid #334155}
+.repTable tr:last-child td{border:0}
+.repSub td{font-weight:900;background:rgba(34,197,94,.12);color:#4ade80}
+.totalBox{background:linear-gradient(135deg,#111827,#0f766e);border:2px solid #22c55e;border-radius:18px;padding:16px;margin:0 12px 12px;text-align:center}
+.totalBox b{font-size:32px;display:block}
+.dateRow{display:flex;gap:8px;padding:0 12px 10px;flex-wrap:wrap;align-items:center}
+.dateRow input{flex:1;min-width:140px;padding:12px;border-radius:12px;border:1px solid #334155;background:#020617;color:#fff;font-size:15px}
+.dateRow button{padding:12px 14px;border-radius:12px;border:1px solid #334155;background:#1e293b;color:#fff;font-weight:800;cursor:pointer}
+.dateRow button.active{background:#22c55e;color:#111}
+.pdfBtn{width:calc(100% - 24px);margin:0 12px 12px;padding:15px;border:0;border-radius:14px;background:#ef4444;color:#fff;font-weight:900;font-size:16px;cursor:pointer}
+.alertBox{background:linear-gradient(135deg,#7f1d1d,#991b1b);border:1px solid #f87171;border-radius:16px;padding:12px;margin:12px;font-size:13px}
+</style>
+</head>
+<body>
+<div class="top"><div class="topRow"><div><h1>أهلا محمد أمين 👋</h1></div><div class="logo">🧾</div></div>
+<span class="status" id="netStatus">● جاري فحص الاتصال...</span>
+</div>
+
+<!-- الرئيسية -->
+<div id="tab-home">
+<div class="cards">
+<div class="card green"><span>إجمالي المرسل</span><b id="tSent">0</b></div>
+<div class="card blue"><span>إجمالي المحصل</span><b id="tGot">0</b></div>
+<div class="card orange"><span>إجمالي المرتجعات</span><b id="tRet">0</b></div>
+<div class="card red"><span>إجمالي المرتجع (بعت - حصلت)</span><b id="tLeft">0</b></div>
+<div class="card"><span>عدد العملاء</span><b id="tClients">0</b></div>
+<div class="card"><span>عدد المناطق</span><b id="tAreas">0</b></div>
+</div>
+<div class="form">
+<h3 style="margin:0">➕ إضافة عميل / منطقة جديدة</h3>
+<label>اسم العميل</label><input id="newClientName" placeholder="مثال: محمد أحمد">
+<label>المنطقة</label><select id="newClientArea"></select>
+<label>أو منطقة جديدة</label><input id="newAreaName" placeholder="اكتب اسم منطقة جديدة">
+<label>رقم التليفون (اختياري)</label><input id="newClientPhone" placeholder="01xxxxxxxxx">
+<button class="save" onclick="addClient()">حفظ العميل</button>
+</div>
+<div style="padding:0 12px"><button class="ghost" onclick="exportBackup()">⬇ تحميل نسخة احتياطية JSON</button>
+<button class="ghost" onclick="exportCSV()">⬇ تصدير العمليات CSV</button>
+<button class="ghost" onclick="resetData()">🔄 إعادة تحميل القايمة الحقيقية (82 عميل)</button></div>
+<div class="alertBox" id="remindBox"></div>
+<div style="padding:0 12px;display:flex;gap:8px"><button type="button" class="ghost" style="margin:0" onclick="undoLast()">↩️ تراجع عن آخر عملية</button><button type="button" class="ghost" style="margin:0" onclick="showTab('history',null)">📝 السجل</button></div>
+<div id="homeOps"></div>
+</div>
+
+<!-- بعت -->
+<div id="tab-sent" class="hidden">
+<div class="note">خانة <b>بعت للعميل كام؟</b> — اختار المنطقة ثم العميل ثم اكتب المبلغ اللي بعته.</div>
+<div id="sentForm"></div>
+<div id="sentAreas" class="areas"></div>
+<div class="search"><input id="sentSearch" placeholder="🔍 ابحث باسم العميل..." oninput="renderSent()"></div>
+<div id="sentList" class="list"></div>
+</div>
+
+<!-- تحصيل -->
+<div id="tab-got" class="hidden">
+<div class="note">خانة <b>حصلت منه كام؟</b> — اختار المنطقة ثم العميل ثم اكتب المبلغ اللي حصلته.</div>
+<div id="gotForm"></div>
+<div id="gotAreas" class="areas"></div>
+<div class="search"><input id="gotSearch" placeholder="🔍 ابحث باسم العميل..." oninput="renderGot()"></div>
+<div id="gotList" class="list"></div>
+</div>
+
+<!-- مرتجعات -->
+<div id="tab-ret" class="hidden">
+<div class="note">خانة <b>المرتجعات</b> — لو العميل رجع فلوس أو بضاعة، سجلها هنا وهتتخصم من المحصل.</div>
+<div id="retForm"></div>
+<div id="retAreas" class="areas"></div>
+<div class="search"><input id="retSearch" placeholder="🔍 ابحث باسم العميل..." oninput="renderRet()"></div>
+<div id="retList" class="list"></div>
+</div>
+
+<!-- التقرير اليومي -->
+<div id="tab-history" class="hidden">
+<div class="note">📊 <b>تقرير يومي</b> — كل منطقة بعملائها: بعت كام / حصلت كام / مرتجع كام — والمرتجع = بعت - حصلت، مفيش باقي عند العميل.</div>
+<div class="dateRow">
+<input type="date" id="reportDate" onchange="setReportDate(this.value)">
+<button type="button" id="btnToday" onclick="setReportDate('today')">اليوم</button>
+<button type="button" id="btnYest" onclick="setReportDate('yest')">امبارح</button>
+<button type="button" id="btnAll" onclick="setReportDate('all')">كل الأيام</button>
+</div>
+<button type="button" class="pdfBtn" onclick="exportReportPDF()">📄 تصدير التقرير PDF</button>
+<button type="button" class="ghost" style="margin:0 12px 12px;width:calc(100% - 24px)" onclick="downloadReportHTML()">⬇ لو الـ PDF مافتحش، دوس هنا لتحميل ملف التقرير</button>
+<div class="search"><input id="histSearch" placeholder="🔍 ابحث باسم العميل..." oninput="renderHistory()"></div>
+<div id="historyList"></div>
+<div id="historyForm"></div>
+</div>
+<!-- العملاء -->
+<div id="tab-clients" class="hidden">
+<div class="search"><input id="clientSearch" placeholder="🔍 ابحث باسم العميل أو المنطقة..." oninput="renderClients()"></div>
+<div id="clientAreas" class="areas"></div>
+<div id="clientList" class="list"></div>
+</div>
+
+<nav class="tabs">
+<button onclick="showTab('home',this)" class="active"><span>🏠</span>الرئيسية</button>
+<button onclick="showTab('sent',this)"><span>📤</span>بعت كام؟</button>
+<button onclick="showTab('got',this)"><span>💰</span>التحصيل</button>
+<button onclick="showTab('ret',this)"><span>↩️</span>المرتجعات</button>
+<button onclick="showTab('clients',this)"><span>👥</span>العملاء</button>
+<button onclick="showTab('history',this)"><span>📊</span>التقرير</button>
+</nav>
+
+<script>
+const DEFAULT_CLIENTS=[
+["البكاتوشي","أبو عبده"],["البكاتوشي","قاصد كريم"],["البكاتوشي","شهاب وساندي"],["البكاتوشي","بازار التركي (تيتو)"],["البكاتوشي","عمران تيك"],["البكاتوشي","بيت العروض (بلايستيشن)"],
+["الـ 500","محمصة الريان"],["الـ 500","بازار هات سيجاره (اللمبي)"],["الـ 500","بازار مكة"],["الـ 500","بازار نوجه"],["الـ 500","بازار أبو عصام"],
+["عزبة البحر","ابن رمضان"],["عزبة البحر","مزيكا"],["عزبة البحر","البان علاء عثمان"],["عزبة البحر","تيتو"],["عزبة البحر","البان الإيمان"],["عزبة البحر","الأخوة"],["عزبة البحر","طيارة"],["عزبة البحر","سنترال العوايد"],
+["نمرة 8","فايف ستار"],["نمرة 8","أولاد شيحة"],["نمرة 8","المحترف"],["نمرة 8","الشيخ محمد"],["نمرة 8","الخطيب"],["نمرة 8","مكسيكو"],
+["نمرة 9","ياقوت"],["نمرة 9","محمد عثمان"],["نمرة 9","الوكيل"],["نمرة 9","عطارة أبناء عمران"],["نمرة 9","أبو شوشة"],["نمرة 9","الزعيم"],["نمرة 9","الرحاب"],["نمرة 9","ماركت الهدي (العربي)"],
+["نمرة 10","بازار الفتح"],["نمرة 10","ركن السلطان"],["نمرة 10","مصطفى عوض"],
+["نمرة 2","العمدة (جمب الفلاح)"],["نمرة 2","أولاد رجب"],["نمرة 2","مكتبة الرضا"],
+["الفتحة الثانية","البرنس"],["الفتحة الثانية","المهندس فون"],["الفتحة الثانية","عطارة أولاد عبد الغفار"],["الفتحة الثانية","بازار أبو المجد"],
+["هيكل","التركي ماركت"],["هيكل","السندباد"],["هيكل","الخضري"],
+["خير بيتها","زيزو (التوآم)"],["خير بيتها","نور فون"],["خير بيتها","المركز الهندسي"],["خير بيتها","الشناوي"],["خير بيتها","عبد الرحمن فون"],["خير بيتها","بالوظة"],["خير بيتها","أبو آدم"],
+["نمرة 7 والنجع","الزمزمي"],["نمرة 7 والنجع","محمصة الصعيدي"],["نمرة 7 والنجع","الشيخ جمال"],["نمرة 7 والنجع","علي الناصية"],["نمرة 7 والنجع","أم يوسف"],
+["الفلكي","هايبر احمد ربيع"],["الفلكي","ماركت الحوت"],["الفلكي","ماركت الفتح"],["الفلكي","توب فون"],["الفلكي","بازار الفلكي"],["الفلكي","بابا المجال"],["الفلكي","الرياض"],["الفلكي","سويتش ستور"],["الفلكي","كازابلانكا"],["الفلكي","شباب 25"],["الفلكي","العميد"],["الفلكي","الراوي"],["الفلكي","خطاب (1)"],["الفلكي","آل رياض خطاب (2)"],["الفلكي","مكتبة كوجي"],["الفلكي","الكسار"],["الفلكي","الفلاح"],["الفلكي","محل عادل"],["الفلكي","المهندس محمود للصيانة"],["الفلكي","الفتح فون"],["الفلكي","مستر ميدو"],["الفلكي","هاني"],["الفلكي","الأزهر الشريف"],["الفلكي","مكتبة سمير"]
+];
+let DB=JSON.parse(localStorage.getItem('tahseel_v1')||'null');
+if(!DB){DB={clients:[],ops:[]};}
+(function(){const have=new Set(DB.clients.map(c=>c.area+'|'+c.name));let maxId=Math.max(0,...DB.clients.map(c=>+c.id||0));DEFAULT_CLIENTS.forEach(c=>{if(!have.has(c[0]+'|'+c[1])){maxId++;DB.clients.push({id:maxId,area:c[0],name:c[1],phone:''});}});const order=new Map(DEFAULT_CLIENTS.map((c,i)=>[c[0]+'|'+c[1],i]));DB.clients.sort((a,b)=>(order.get(a.area+'|'+a.name)??999)-(order.get(b.area+'|'+b.name)??999));DB.ops.forEach((o,i)=>{if(!o.id)o.id=Date.now()+i;if(!o.dateKey)o.dateKey=new Date().toISOString().slice(0,10);});localStorage.setItem('tahseel_v1',JSON.stringify(DB));})();
+function save(){localStorage.setItem('tahseel_v1',JSON.stringify(DB));renderAll();}
+function areas(){return [...new Set(DB.clients.map(c=>c.area))];}
+function statsFor(id){let s=0,g=0,rOps=0;DB.ops.filter(o=>o.clientId==id).forEach(o=>{if(o.type=='sent')s+=+o.amount;if(o.type=='got')g+=+o.amount;if(o.type=='ret')rOps+=+o.amount;});const ret=Math.max(0,s-g);return{sent:s,got:g,ret:ret,retOps:rOps,left:0};}
+function showTab(t,btn){document.querySelectorAll('[id^="tab-"]').forEach(e=>e.classList.add('hidden'));document.getElementById('tab-'+t).classList.remove('hidden');document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');window.scrollTo(0,0);}
+let selSent='الكل',selGot='الكل',selRet='الكل',selClient='الكل';
+function areaButtons(el,sel,cb){const a=areas();let h=`<button class="${sel=='الكل'?'active':''}" onclick="${cb}('الكل')">الكل (${DB.clients.length})</button>`;a.forEach(x=>{const n=DB.clients.filter(c=>c.area==x).length;h+=`<button class="${sel==x?'active':''}" onclick="${cb}('${x}')">${x} (${n})</button>`});document.getElementById(el).innerHTML=h;}
+function setSent(a){selSent=a;renderSent();}function setGot(a){selGot=a;renderGot();}function setRet(a){selRet=a;renderRet();}function setClientArea(a){selClient=a;renderClients();}
+function clientCard(c,mode){
+ const st=statsFor(c.id);
+ const editLabel=mode=='sent'?'✏️ تعديل المبلغ':mode=='got'?'✏️ تعديل المبلغ':mode=='ret'?'✏️ تعديل المبلغ':'';
+ const editBtn=(mode=='sent'||mode=='got'||mode=='ret')?`<button type="button" class="bEdit" onclick="openEditAmount('${mode}',${c.id})">${editLabel}</button>`:'';
+ const mainBtn=mode=='sent'?`<button type="button" class="b1" onclick="openForm('sent',${c.id})">📤 بعت كام؟</button>`:mode=='got'?`<button type="button" class="b2" onclick="openForm('got',${c.id})">💰 حصلت كام؟</button>`:mode=='ret'?`<button type="button" class="b3" onclick="openForm('ret',${c.id})">↩️ مرتجع</button>`:'';
+ return `<div class="item"><div class="itemTop"><div><h3>${c.name}</h3><small>${c.area} • ${c.phone||'بدون رقم'}</small><br><span class="badge">${c.area}</span></div><div class="bigAmount"><small>📤 بعت للعميل</small><b>${st.sent}</b><span>جنيه</span></div></div><div class="pills"><span class="red">↩️ مرتجع: ${st.ret} ج</span><span>📤 بعت: ${st.sent}</span><span class="green">💰 حصلت: ${st.got}</span></div>
+ <div class="row">${mainBtn}${editBtn}</div></div>`;
+}
+function renderSent(){areaButtons('sentAreas',selSent,'setSent');let q=(document.getElementById('sentSearch').value||'').trim();let list=DB.clients.filter(c=>(selSent=='الكل'||c.area==selSent)&&(!q||c.name.includes(q)));document.getElementById('sentList').innerHTML=list.map(c=>clientCard(c,'sent')).join('')||'<p style="text-align:center;color:#94a3b8">لا يوجد عملاء</p>';}
+function renderGot(){areaButtons('gotAreas',selGot,'setGot');let q=(document.getElementById('gotSearch').value||'').trim();let list=DB.clients.filter(c=>(selGot=='الكل'||c.area==selGot)&&(!q||c.name.includes(q)));document.getElementById('gotList').innerHTML=list.map(c=>clientCard(c,'got')).join('')||'<p style="text-align:center;color:#94a3b8">لا يوجد عملاء</p>';}
+function renderRet(){areaButtons('retAreas',selRet,'setRet');let q=(document.getElementById('retSearch').value||'').trim();let list=DB.clients.filter(c=>(selRet=='الكل'||c.area==selRet)&&(!q||c.name.includes(q)));document.getElementById('retList').innerHTML=list.map(c=>clientCard(c,'ret')).join('')||'<p style="text-align:center;color:#94a3b8">لا يوجد عملاء</p>';}
+function renderClients(){areaButtons('clientAreas',selClient,'setClientArea');let q=(document.getElementById('clientSearch').value||'').trim();let list=DB.clients.filter(c=>(selClient=='الكل'||c.area==selClient)&&(!q||c.name.includes(q)||c.area.includes(q)));document.getElementById('clientList').innerHTML=list.map(c=>clientCard(c,'all')).join('');}
+function openForm(type,id){
+ const c=DB.clients.find(x=>x.id==id);const titles={sent:'بعت للعميل كام؟',got:'حصلت منه كام؟',ret:'مبلغ المرتجع كام؟'};
+ const el=document.getElementById(type+'Form');
+ el.innerHTML=`<div class="form"><h3 style="margin:0">${titles[type]} — ${c.name} (${c.area})</h3>
+ <label>المبلغ بالجنيه</label><input id="amt_${type}" type="text" inputmode="numeric" autocomplete="off" class="big" placeholder="اكتب المبلغ هنا - مثال: 500">
+ ${type=='got'?`<label>طريقة الدفع</label><select id="pay_${type}"><option>كاش</option><option>فودافون كاش</option><option>انستا باي</option><option>تحويل بنكي</option></select>`:''}
+ ${type=='ret'?`<label>سبب المرتجع</label><select id="reason_ret"><option>رجع فلوس</option><option>رجع بضاعة</option><option>خصم</option><option>غيره</option></select>`:''}
+ <label>ملاحظة (اختياري)</label><input id="note_${type}" placeholder="اكتب أي ملاحظة">
+ <button type="button" class="save" onclick="saveOp('${type}',${id})">✅ حفظ</button><button type="button" class="ghost" onclick="document.getElementById('${type}Form').innerHTML=''">إلغاء</button></div>`;
+ // الفورم فوق دلوقتي - نطلع لفوق بس، مش ننزل للآخر
+ window.scrollTo({top:0,behavior:'smooth'});
+ setTimeout(()=>{const inp=document.getElementById('amt_'+type);if(inp)inp.focus();},300);
+}
+// *** تعديل المبلغ: تدخل رقم تاني من أول وجديد ***
+function openEditAmount(type,id){
+ const c=DB.clients.find(x=>x.id==id);
+ const ops=DB.ops.filter(o=>o.clientId==id&&o.type==type);
+ const el=document.getElementById(type+'Form');
+ const title=type=='sent'?'تعديل مبلغ البعت':type=='got'?'تعديل مبلغ التحصيل':'تعديل المرتجع';
+ if(!ops.length){
+   el.innerHTML=`<div class="form"><h3 style="margin:0">✏️ ${title} — ${c.name}</h3><p style="color:#cbd5e1">مفيش مبلغ مسجل للعميل ده لسه. دوس "بعت كام؟" وسجّل الأول.</p><button type="button" class="ghost" onclick="document.getElementById('${type}Form').innerHTML=''">إغلاق</button></div>`;
+   window.scrollTo({top:0,behavior:'smooth'});return;
+ }
+ const last=ops[0]; // آخر عملية سجلتها للعميل ده
+ el.innerHTML=`<div class="form"><h3 style="margin:0">✏️ ${title} — ${c.name} (${c.area})</h3>
+ <p style="color:#fbbf24;font-size:14px">الرقم الغلط اللي سجلته: <b style="font-size:20px">${last.amount} ج</b></p>
+ <p style="color:#cbd5e1;font-size:13px">اكتب الرقم الصح من أول وجديد هنا:</p>
+ <label>الرقم الصح الجديد - لو مبعتش للعميل اكتب 0</label><input id="newAmt_${type}" type="text" inputmode="numeric" autocomplete="off" class="big" placeholder="اكتب الرقم الصح - أو 0 لو مبعتش">
+ <button type="button" class="save" onclick="saveReenter('${type}',${id},${last.id})">✅ حفظ الرقم الجديد</button><button type="button" class="ghost" onclick="document.getElementById('${type}Form').innerHTML=''">إلغاء</button></div>`;
+ window.scrollTo({top:0,behavior:'smooth'});
+ setTimeout(()=>{const inp=document.getElementById('newAmt_'+type);if(inp)inp.focus();},300);
+}
+function saveReenter(type,clientId,opId){
+ const o=DB.ops.find(x=>x.id==opId);if(!o){alert('العملية مش موجودة');return;}
+ const raw=(document.getElementById('newAmt_'+type)?.value||'').trim();
+ if(raw===''){alert('اكتب الرقم الصح الأول - لو مبعتش اكتب 0');return;}
+ const amt=toNum(raw);
+ if(amt<0){alert('المبلغ مينفعش يكون بالسالب');return;}
+ o.amount=amt;o.edited=true;save();
+ document.getElementById(type+'Form').innerHTML='';
+ const c=DB.clients.find(x=>x.id==clientId);
+ showSaved(amt===0?'✅ اتعدل الرقم إلى 0 - يعني مبعتش للعميل':('✅ اتعدل الرقم إلى '+amt+' ج - '+(c?c.name:'')));
+}
+function toNum(v){if(v==null)return 0;v=String(v).trim().replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/,/g,'').replace(/\s/g,'');return +v;}
+function showSaved(msg){
+ let b=document.getElementById('savedBanner');
+ if(!b){b=document.createElement('div');b.id='savedBanner';b.style.cssText='position:fixed;top:70px;left:12px;right:12px;z-index:99;background:#22c55e;color:#06130A;padding:14px;border-radius:14px;font-weight:900;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.4)';document.body.appendChild(b);}
+ b.textContent=msg;b.style.display='block';setTimeout(()=>{b.style.display='none'},3000);
+}
+function saveOp(type,id){
+ const amt=toNum(document.getElementById('amt_'+type)?.value);
+ if(!amt||amt<=0){alert('اكتب المبلغ الأول - مثال: 500');return;}
+ const c=DB.clients.find(x=>x.id==id);
+ const note=document.getElementById('note_'+type)?.value||'';
+ const extra=type=='got'?document.getElementById('pay_got')?.value||'':type=='ret'?document.getElementById('reason_ret')?.value||'':'';
+ DB.ops.unshift({id:Date.now()+Math.floor(Math.random()*1000),clientId:id,type,amount:amt,note,extra,date:new Date().toLocaleString('ar-EG'),dateKey:new Date().toISOString().slice(0,10)});
+ save();
+ document.getElementById(type+'Form').innerHTML='';
+ const label=type=='sent'?'📤 اتبعت':type=='got'?'💰 اتحصل':'↩️ مرتجع';
+ showSaved('✅ اتسجل '+label+' '+amt+' ج - '+(c?c.name:''));
+}
+function editClient(id){
+ const c=DB.clients.find(x=>x.id==id);
+ const name=prompt('عدّل اسم العميل:',c.name);if(name===null)return;
+ const phone=prompt('عدّل رقم التليفون:',c.phone||'');if(phone===null)return;
+ const area=prompt('عدّل المنطقة:',c.area);if(area===null)return;
+ c.name=name.trim()||c.name;c.phone=(phone||'').trim();c.area=(area||'').trim()||c.area;save();alert('تم تعديل العميل ✅');
+}
+function undoLast(){
+ if(!DB.ops.length){alert('مفيش عمليات للتراجع');return;}
+ const o=DB.ops[0];const c=DB.clients.find(x=>x.id==o.clientId);
+ if(!confirm('تراجع عن آخر عملية؟ '+o.amount+' ج - '+(c?c.name:'')))return;
+ DB.ops.shift();save();alert('تم التراجع ✅');
+}
+function editOp(id){
+ const o=DB.ops.find(x=>x.id==id);if(!o)return;const c=DB.clients.find(x=>x.id==o.clientId);
+ showTab('history',null);
+ const box=document.getElementById('historyForm');
+ box.innerHTML=`<div class="form"><h3 style="margin:0">✏️ تعديل العملية</h3><p style="color:#cbd5e1">القديم: <b>${o.amount} ج</b> - ${c?c.name:''}</p><label>المبلغ الصح الجديد - لو مبعتش اكتب 0</label><input id="editAmt" type="text" inputmode="numeric" class="big" value=""><button type="button" class="save" onclick="saveEditOp(${id})">✅ حفظ الرقم الجديد</button><button type="button" class="ghost" onclick="document.getElementById('historyForm').innerHTML=''">إلغاء</button></div>`;
+ window.scrollTo({top:0,behavior:'smooth'});
+}
+function saveEditOp(id){
+ const o=DB.ops.find(x=>x.id==id);const raw=(document.getElementById('editAmt')?.value||'').trim();if(raw===''){alert('اكتب المبلغ الصح - لو مبعتش اكتب 0');return;}const amt=toNum(raw);if(amt<0){alert('المبلغ مينفعش يكون بالسالب');return;}
+ o.amount=amt;o.edited=true;save();document.getElementById('historyForm').innerHTML='';showSaved('✅ اتعدل الرقم إلى '+amt+' ج');
+}
+function delOp(id){
+ const o=DB.ops.find(x=>x.id==id);if(!o)return;
+ if(!confirm('متأكد تحذف العملية دي؟ '+o.amount+' جنيه'))return;
+ DB.ops=DB.ops.filter(x=>x.id!=id);save();alert('تم حذف العملية ✅');
+}
+let reportFilter='today';
+function todayKey(){return new Date().toISOString().slice(0,10);}
+function yestKey(){const d=new Date();d.setDate(d.getDate()-1);return d.toISOString().slice(0,10);}
+function setReportDate(v){
+ if(v=='today'){reportFilter='today';const el=document.getElementById('reportDate');if(el)el.value=todayKey();}
+ else if(v=='yest'){reportFilter='yest';const el=document.getElementById('reportDate');if(el)el.value=yestKey();}
+ else if(v=='all'){reportFilter='all';}
+ else {reportFilter=v;const el=document.getElementById('reportDate');if(el)el.value=v;}
+ document.getElementById('btnToday')?.classList.toggle('active',reportFilter=='today');
+ document.getElementById('btnYest')?.classList.toggle('active',reportFilter=='yest');
+ document.getElementById('btnAll')?.classList.toggle('active',reportFilter=='all');
+ renderHistory();
+}
+function reportOps(){
+ let ops=DB.ops;
+ if(reportFilter=='today')ops=ops.filter(o=>(o.dateKey||todayKey())==todayKey());
+ else if(reportFilter=='yest')ops=ops.filter(o=>(o.dateKey||'')==yestKey());
+ else if(reportFilter!='all')ops=ops.filter(o=>(o.dateKey||'')==reportFilter);
+ return ops;
+}
+function renderHistory(){
+ const q=(document.getElementById('histSearch')?.value||'').trim();
+ const ops=reportOps();
+ const dateLabel=reportFilter=='today'?'تقرير اليوم - '+new Date().toLocaleDateString('ar-EG'):reportFilter=='yest'?'تقرير امبارح':reportFilter=='all'?'تقرير كل الأيام':'تقرير '+reportFilter;
+ // ترتيب المناطق والعملاء بنفس ترتيب القايمة الحقيقية
+ const areaOrder=new Map();const clientOrder=new Map();
+ DEFAULT_CLIENTS.forEach((c,i)=>{if(!areaOrder.has(c[0]))areaOrder.set(c[0],areaOrder.size);clientOrder.set(c[0]+'|'+c[1],i);});
+ const byArea={};
+ ops.forEach(o=>{
+   const c=DB.clients.find(x=>x.id==o.clientId);if(!c)return;
+   if(q&&!c.name.includes(q))return;
+   if(!byArea[c.area])byArea[c.area]={};
+   if(!byArea[c.area][c.id])byArea[c.area][c.id]={c,sent:0,got:0,ret:0};
+   const row=byArea[c.area][c.id];
+   if(o.type=='sent')row.sent+=+o.amount;if(o.type=='got')row.got+=+o.amount;/* المرتجع مش عملية منفصلة - هو الباقي: بعت - حصلت */
+ });
+ let html=`<div style="padding:0 12px 8px"><h3 style="margin:0">📊 ${dateLabel}</h3></div>`;
+ let TS=0,TG=0,TR=0;
+ const areasSorted=Object.keys(byArea).sort((a,b)=>(areaOrder.get(a)??99)-(areaOrder.get(b)??99));
+ if(!areasSorted.length)html+='<p style="text-align:center;color:#94a3b8;padding:20px">مفيش عمليات في اليوم ده لسه.<br>سجّل عمليات من "بعت كام؟" وهتظهر هنا.</p>';
+ areasSorted.forEach(area=>{
+   const rows=Object.values(byArea[area]).sort((a,b)=>(clientOrder.get(a.c.area+'|'+a.c.name)??999)-(clientOrder.get(b.c.area+'|'+b.c.name)??999));
+   let aS=0,aG=0,aR=0;
+   let trs='';
+   rows.forEach(r=>{
+     const left=r.sent-r.got; /* المرتجع = الباقي، مفيش باقي عند العميل */aS+=r.sent;aG+=r.got;aR+=(r.sent-r.got);
+     trs+=`<tr><td><b>${r.c.name}</b></td><td>${r.sent}</td><td>${r.got}</td><td>${r.sent-r.got}</td><td><button type="button" onclick="editOpForClient(${r.c.id},'${reportFilter}')" style="padding:6px 10px;border-radius:999px;border:0;background:#f59e0b;font-weight:800;cursor:pointer">✏️ تعديل</button></td></tr>`;
+   });
+   TS+=aS;TG+=aG;TR+=aR;
+   html+=`<div class="repArea"><h3>📍 ${area}</h3><table class="repTable"><tr><th>العميل</th><th>📤 بعت</th><th>💰 حصلت</th><th>↩️ رجع</th><th>↩️ مرتجع</th><th></th></tr>${trs}<tr class="repSub"><td>مجموع ${area}</td><td>${aS}</td><td>${aG}</td><td>${aR}</td><td>${aS-aG-aR}</td><td></td></tr></table></div>`;
+ });
+ const leftTotal=TS-TG; /* المرتجع = بعت - حصلت */
+ html+=`<div class="totalBox"><span style="color:#a7f3d0;font-weight:800">💰 مجموع التحصيل</span><b>${TG} جنيه</b><span style="color:#d1fae5">إجمالي بعت: ${TS} ج • إجمالي مرتجع: ${TR} ج • إجمالي المرتجع: ${leftTotal} ج</span></div>`;
+ const el=document.getElementById('historyList');if(el)el.innerHTML=html;
+}
+function editOpForClient(clientId,filter){
+ const c=DB.clients.find(x=>x.id==clientId);if(!c)return;
+ const ops=reportOps().filter(o=>o.clientId==clientId);
+ if(!ops.length){alert('مفيش عمليات');return;}
+ const box=document.getElementById('historyForm');
+ let rows='';
+ ops.forEach(o=>{
+   rows+=`<div style="background:#020617;border:1px solid #f59e0b;border-radius:14px;padding:10px;margin-top:8px"><b>${o.type=='sent'?'📤 بعت':o.type=='got'?'💰 حصلت':'↩️ مرتجع'} ${o.amount} ج</b> <small style="color:#94a3b8">${o.date||''}</small><label style="display:block;margin-top:6px">الرقم الصح الجديد - أو 0 لو مبعتش</label><input id="repEdit_${o.id}" type="text" inputmode="numeric" value="${o.amount}" style="width:100%;padding:12px;border-radius:12px;border:1px solid #334155;background:#111827;color:#fff;font-size:18px"><div class="opBtns"><button type="button" style="background:#22c55e;flex:1" onclick="saveRepEdit(${o.id})">✅ حفظ</button><button type="button" style="background:#ef4444;color:#fff;flex:1" onclick="delOp(${o.id})">🗑 حذف</button></div></div>`;
+ });
+ box.innerHTML=`<div class="form"><h3 style="margin:0">✏️ تعديل - ${c.name}</h3>${rows}<button type="button" class="ghost" onclick="document.getElementById('historyForm').innerHTML=''">إغلاق</button></div>`;
+ box.scrollIntoView({behavior:'smooth'});
+}
+function saveRepEdit(opId){
+ const o=DB.ops.find(x=>x.id==opId);if(!o)return;
+ const raw=(document.getElementById('repEdit_'+opId)?.value||'').trim();if(raw===''){alert('اكتب الرقم - أو 0 لو مبعتش');return;}
+ const amt=toNum(raw);if(amt<0){alert('مينفعش بالسالب');return;}
+ o.amount=amt;o.edited=true;save();document.getElementById('historyForm').innerHTML='';showSaved('✅ اتعدل الرقم إلى '+amt+' ج');
+}
+function buildReportHTML(){
+ const ops=reportOps();
+ const dateLabel=reportFilter=='today'?'تقرير اليوم - '+new Date().toLocaleDateString('ar-EG'):reportFilter=='yest'?'تقرير امبارح':reportFilter=='all'?'تقرير كل الأيام':'تقرير '+reportFilter;
+ const areaOrder=new Map();const clientOrder=new Map();
+ DEFAULT_CLIENTS.forEach((c,i)=>{if(!areaOrder.has(c[0]))areaOrder.set(c[0],areaOrder.size);clientOrder.set(c[0]+'|'+c[1],i);});
+ const byArea={};
+ ops.forEach(o=>{const c=DB.clients.find(x=>x.id==o.clientId);if(!c)return;if(!byArea[c.area])byArea[c.area]={};if(!byArea[c.area][c.id])byArea[c.area][c.id]={c,sent:0,got:0,ret:0};const r=byArea[c.area][c.id];if(o.type=='sent')r.sent+=+o.amount;if(o.type=='got')r.got+=+o.amount;/* المرتجع = بعت - حصلت */});
+ let TS=0,TG=0,TR=0,body='';
+ Object.keys(byArea).sort((a,b)=>(areaOrder.get(a)??99)-(areaOrder.get(b)??99)).forEach(area=>{
+   const rows=Object.values(byArea[area]).sort((a,b)=>(clientOrder.get(a.c.area+'|'+a.c.name)??999)-(clientOrder.get(b.c.area+'|'+b.c.name)??999));
+   let aS=0,aG=0,aR=0,trs='';
+   rows.forEach(r=>{const left=r.sent-r.got; /* المرتجع = الباقي، مفيش باقي عند العميل */aS+=r.sent;aG+=r.got;aR+=(r.sent-r.got);trs+=`<tr><td>${r.c.name}</td><td>${r.sent}</td><td>${r.got}</td><td>${r.ret}</td><td>${left}</td></tr>`;});
+   TS+=aS;TG+=aG;TR+=aR;
+   body+=`<h3 style="background:#eee;padding:8px;margin:18px 0 0">${area} - مجموع: بعت ${aS} | حصلت ${aG} | مرتجع ${aR}</h3><table><tr><th>العميل</th><th>بعت</th><th>حصلت</th><th>مرتجع</th><th>↩️ مرتجع</th></tr>${trs}</table>`;
+ });
+ if(!body)body='<p style="text-align:center">مفيش عمليات في اليوم ده لسه.</p>';
+ return {html:`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>${dateLabel}</title><style>body{font-family:Tahoma,Arial;padding:20px;color:#000;background:#fff}h1,h2{text-align:center}table{width:100%;border-collapse:collapse;margin-top:6px}th,td{border:1px solid #333;padding:8px;text-align:right}th{background:#222;color:#fff}.total{border:3px solid #000;padding:16px;text-align:center;margin-top:20px;font-size:20px;font-weight:900}</style></head><body><h1>🧾 تقرير تحصيل ماكينات شحن</h1><h2>${dateLabel}</h2>${body}<div class="total">💰 مجموع التحصيل: ${TG} جنيه<br>إجمالي بعت: ${TS} ج • إجمالي مرتجع: ${TR} ج • إجمالي المرتجع: ${TS-TG} ج</div></body></html>`,TG,TS,TR};
+}
+function exportReportPDF(){
+ const r=buildReportHTML();
+ // الطريقة 1: افتح التقرير في تاب جديد - شغالة على أغلب الموبايلات
+ try{
+   const blob=new Blob([r.html],{type:'text/html;charset=utf-8'});
+   const url=URL.createObjectURL(blob);
+   const w=window.open(url,'_blank');
+   if(w){
+     showSaved('✅ التقرير اتفتح - دوس مشاركة / طباعة واختار "حفظ كـ PDF"');
+     setTimeout(()=>{try{w.focus();}catch(e){}},300);
+     return;
+   }
+ }catch(e){}
+ // الطريقة 2: لو المتصفح منع فتح تاب جديد - اطبع من نفس الصفحة بـ iframe مخفي
+ try{
+   let frame=document.getElementById('printFrame');
+   if(!frame){frame=document.createElement('iframe');frame.id='printFrame';frame.style.cssText='position:fixed;right:0;bottom:0;width:0;height:0;border:0';document.body.appendChild(frame);}
+   const doc=frame.contentWindow.document;
+   doc.open();doc.write(r.html);doc.close();
+   setTimeout(()=>{try{frame.contentWindow.focus();frame.contentWindow.print();showSaved('✅ اختار "حفظ كـ PDF" من نافذة الطباعة');}catch(e){downloadReportHTML();}},400);
+ }catch(e){downloadReportHTML();}
+}
+function downloadReportHTML(){
+ const r=buildReportHTML();
+ const blob=new Blob([r.html],{type:'text/html;charset=utf-8'});
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='تقرير-التحصيل.html';a.click();
+ showSaved('⬇ اتحمل ملف التقرير - افتحه ودوس طباعة / حفظ كـ PDF');
+}
+function addClient(){
+ const name=document.getElementById('newClientName').value.trim();let area=document.getElementById('newAreaName').value.trim()||document.getElementById('newClientArea').value;
+ const phone=document.getElementById('newClientPhone').value.trim();if(!name||!area){alert('اكتب اسم العميل والمنطقة');return;}
+ DB.clients.push({id:Date.now(),area,name,phone});document.getElementById('newClientName').value='';document.getElementById('newAreaName').value='';document.getElementById('newClientPhone').value='';save();alert('تم إضافة العميل ✅');
+}
+function delClient(id){if(!confirm('متأكد تحذف العميل ده؟'))return;DB.clients=DB.clients.filter(c=>c.id!=id);DB.ops=DB.ops.filter(o=>o.clientId!=id);save();}
+function resetData(){if(!confirm('هترجع القايمة الحقيقية 82 عميل؟ أي عمليات جديدة هتفضل موجودة لو العملاء موجودين.'))return;const existing=new Set(DB.clients.map(c=>c.name+'|'+c.area));DEFAULT_CLIENTS.forEach((c,i)=>{if(!existing.has(c[0]+'|'+c[1]))DB.clients.push({id:Date.now()+i,area:c[0],name:c[1],phone:''})});save();alert('تم ✅');}
+function exportBackup(){const blob=new Blob([JSON.stringify(DB)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='tahseel-backup.json';a.click();}
+function exportCSV(){let csv='التاريخ,العميل,المنطقة,النوع,المبلغ,ملاحظة\n';DB.ops.forEach(o=>{const c=DB.clients.find(x=>x.id==o.clientId);if(c)csv+=`${o.date},${c.name},${c.area},${o.type},${o.amount},${o.note||''}\n`});const blob=new Blob(['\ufeff'+csv],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='tahseel.csv';a.click();}
+function renderAll(){
+ let s=0,g=0,r=0;DB.ops.forEach(o=>{if(o.type=='sent')s+=+o.amount;if(o.type=='got')g+=+o.amount;if(o.type=='ret')r+=+o.amount});
+ document.getElementById('tSent').textContent=s+' ج';document.getElementById('tGot').textContent=g+' ج';document.getElementById('tRet').textContent=r+' ج';document.getElementById('tLeft').textContent=(s-g)+' ج';
+ document.getElementById('tClients').textContent=DB.clients.length;document.getElementById('tAreas').textContent=areas().length;
+ const sel=document.getElementById('newClientArea');sel.innerHTML=areas().map(a=>`<option>${a}</option>`).join('');
+ let h='<div class="hist"><h3 style="margin:0">آخر العمليات</h3>';DB.ops.slice(0,15).forEach(o=>{const c=DB.clients.find(x=>x.id==o.clientId);if(c)h+=`<div class="opRow"><b>${o.type=='sent'?'📤 بعت':o.type=='got'?'💰 حصلت':'↩️ مرتجع'} ${o.amount} ج</b> — ${c.name} (${c.area})<br><small>${o.date} ${o.extra? '• '+o.extra:''} ${o.note? '• '+o.note:''} ${o.edited?'• ✏️ اتعدلت':''}</small><div class="opBtns"><button type="button" style="background:#f59e0b" onclick="editOp(${o.id})">✏️ تعديل الرقم</button><button type="button" style="background:#ef4444;color:#fff" onclick="delOp(${o.id})">🗑 حذف</button></div></div>`});h+='</div>';document.getElementById('homeOps').innerHTML=h;
+ const withOps=new Set(DB.ops.map(o=>o.clientId));
+ const noOps=DB.clients.filter(c=>!withOps.has(c.id));
+ const bigLeft=DB.clients.map(c=>({c,left:statsFor(c.id).ret})).filter(x=>x.left>0).sort((a,b)=>b.left-a.left).slice(0,5);
+ let rem='🧠 <b>لو ناسي:</b><br>';
+ if(noOps.length)rem+=`• فيه ${noOps.length} عميل لسه ماسجلتش ليهم أي عملية<br>`;
+ if(bigLeft.length)rem+=`• أكبر مرتجع عندهم: ${bigLeft.map(x=>x.c.name+' ('+x.left+' ج)').join('، ')}<br>`;
+ rem+='• لو كتبت رقم غلط، دوس تعديل المبلغ واكتب الرقم الصح من أول وجديد.';
+ const rb=document.getElementById('remindBox');if(rb)rb.innerHTML=rem;
+ renderHistory();
+ renderSent();renderGot();renderRet();renderClients();
+}
+function updateNet(){const el=document.getElementById('netStatus');el.textContent=navigator.onLine?'● متصل':'● بدون نت - شغال من الجهاز';el.className='status'+(navigator.onLine?'':' offline');}
+window.addEventListener('online',updateNet);window.addEventListener('offline',updateNet);updateNet();const rd=document.getElementById('reportDate');if(rd)rd.value=todayKey();setReportDate('today');renderAll();
+</script>
+</body>
+</html>
